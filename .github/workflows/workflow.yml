@@ -1,16 +1,21 @@
-name: Build
+name: Pipeline
 
 on: [push]
 
-steps:
-  - uses: actions/checkout@master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
 
-  - uses: actions/setup-go@v1
-    with:
-      go-version: '1.14.0'
+    steps:
+      - uses: actions/checkout@master
 
-  - name: Build image
-    run: docker build .
+      - uses: actions/setup-go@v1
+        with:
+          go-version: '1.14.0'
 
-  - name: Run tests
-    run: go test .
+      - name: Build image
+        run: docker build .
+
+      - name: Run tests
+        run: go test .
