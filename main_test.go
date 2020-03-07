@@ -21,6 +21,6 @@ import (
 
 var _ = Describe("the cache-init image", func() {
 	It("can do addition", func() {
-		Expect(1+1).To(Equal(2))
+		Expect(1 + 1).To(Equal(2))
 	})
 })
