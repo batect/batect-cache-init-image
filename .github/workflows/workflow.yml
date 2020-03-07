@@ -22,6 +22,9 @@ jobs:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-${{ hashFiles('**/go.sum') }}
 
+      - name: Check for missing license header
+        run: ./scripts/check_licenses.sh
+
       - name: Build image
         run: docker build .
 
