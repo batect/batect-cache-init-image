@@ -31,7 +31,7 @@ jobs:
         run: ./scripts/check_licenses.sh
 
       - name: Lint
-        uses: golangci-lint run .
+        run: golangci-lint run .
 
       - name: Build application
         run: CGO_ENABLED=0 go build -o /tmp/application .
