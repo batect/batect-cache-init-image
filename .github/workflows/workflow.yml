@@ -34,10 +34,10 @@ jobs:
         run: golangci-lint run .
 
       - name: Build application
-        run: CGO_ENABLED=0 go build -o /tmp/application .
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o docker/app .
 
       - name: Build image
-        run: docker build -t $IMAGE_TAG .
+        run: docker build -t $IMAGE_TAG docker
         env:
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
 

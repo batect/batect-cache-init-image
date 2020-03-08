@@ -1,0 +1,3 @@
+FROM gcr.io/distroless/static:48dba0a4ace4fcb4fdd8d7e1f7dc1a9ed8b38f7c
+COPY /app /
+CMD ["/app"]
