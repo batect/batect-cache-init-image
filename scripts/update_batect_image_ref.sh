@@ -15,7 +15,7 @@ FILE="app/src/main/resources/cache-init-image-reference"
 
   echo "Configuring Git..."
   git config user.name "batect-cache-init-image pipeline"
-  git config user.email "cache-init-image-pipeline@batect.dev"
+  git config user.email "batect-github-actions@batect.dev"
   echo
 
   echo "Setting image reference to '$IMAGE_DIGEST'..."
