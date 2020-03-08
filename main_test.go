@@ -15,27 +15,186 @@
 package main_test
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
-	"strings"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("the cache-init image", func() {
-	Context("when the application is given an empty specification", func() {
+	Context("when the application is given an empty configuration", func() {
 		var result executionResult
 
 		BeforeEach(func() {
-			result = runImage("{}")
+			result = runImage(noVolumes, "{}")
 		})
 
-		It("returns a zero exit code and no output", func() {
+		It("returns a zero exit code and no error", func() {
 			Expect(result).To(Equal(executionResult{
-				Output:   "",
+				Output:   "Done.",
 				ExitCode: 0,
+			}))
+		})
+	})
+
+	Context("when the application is given a configuration with a single volume", func() {
+		var volumeName string
+		var volumes []string
+
+		BeforeEach(func() {
+			volumeName = createEmptyVolume()
+			volumes = []string{volumeName}
+		})
+
+		AfterEach(func() {
+			deleteVolume(volumeName)
+		})
+
+		singleVolumeConfig := `{
+								"caches": [
+									{ "path": "/caches/1" }
+								]
+							}`
+
+		singleVolumeWithUidAndGidConfig := `{
+								"caches": [
+									{ "path": "/caches/1", "uid": 123, "gid": 456 }
+								]
+							}`
+
+		itReturnsAZeroExitCodeAndNoError := func(result *executionResult) {
+			It("returns a zero exit code and no error", func() {
+				Expect(*result).To(Equal(executionResult{
+					Output:   "Processed /caches/1.\r\nDone.",
+					ExitCode: 0,
+				}))
+			})
+		}
+
+		itEnsuresVolumeContainsCacheInitFile := func(volumeContents *volume, uid int, gid int) {
+			It("ensures that the volume contains a .cache-init file with the provided user and group", func() {
+				Expect(volumeContents.Contents).To(ContainElement(volumeEntry{
+					Uid:  uid,
+					Gid:  gid,
+					Name: ".cache-init",
+				}))
+			})
+		}
+
+		itSetsOwnerAndGroupOfVolume := func(volumeContents *volume, uid int, gid int) {
+			It("sets the owner of the volume to the provided user", func() {
+				Expect(volumeContents.Uid).To(Equal(uid))
+			})
+
+			It("sets the group of the volume to the provided group", func() {
+				Expect(volumeContents.Gid).To(Equal(gid))
+			})
+		}
+
+		Context("when the volume is empty", func() {
+			Context("when no user or group is provided", func() {
+				var result executionResult
+				var volumeContents volume
+
+				BeforeEach(func() {
+					result = runImage(volumes, singleVolumeConfig)
+					volumeContents = getVolumeContents(volumeName)
+				})
+
+				itReturnsAZeroExitCodeAndNoError(&result)
+				itEnsuresVolumeContainsCacheInitFile(&volumeContents, 0, 0)
+			})
+
+			Context("when a user and group are provided", func() {
+				var result executionResult
+				var volumeContents volume
+
+				BeforeEach(func() {
+					result = runImage(volumes, singleVolumeWithUidAndGidConfig)
+					volumeContents = getVolumeContents(volumeName)
+				})
+
+				itReturnsAZeroExitCodeAndNoError(&result)
+				itSetsOwnerAndGroupOfVolume(&volumeContents, 123, 456)
+				itEnsuresVolumeContainsCacheInitFile(&volumeContents, 123, 456)
+			})
+		})
+
+		Context("when the volume already contains a .cache-init file", func() {
+			BeforeEach(func() {
+				addCacheInitFile(volumeName)
+			})
+
+			Context("when no user or group is provided", func() {
+				var result executionResult
+				var volumeContents volume
+
+				BeforeEach(func() {
+					result = runImage(volumes, singleVolumeConfig)
+					volumeContents = getVolumeContents(volumeName)
+				})
+
+				itReturnsAZeroExitCodeAndNoError(&result)
+				itEnsuresVolumeContainsCacheInitFile(&volumeContents, 0, 0)
+			})
+
+			Context("when a user and group are provided", func() {
+				var result executionResult
+				var volumeContents volume
+
+				BeforeEach(func() {
+					result = runImage(volumes, singleVolumeWithUidAndGidConfig)
+					volumeContents = getVolumeContents(volumeName)
+				})
+
+				itReturnsAZeroExitCodeAndNoError(&result)
+				itSetsOwnerAndGroupOfVolume(&volumeContents, 123, 456)
+				itEnsuresVolumeContainsCacheInitFile(&volumeContents, 123, 456)
+			})
+		})
+	})
+
+	Context("when the application is given a configuration with multiple volumes", func() {
+		var volume1Name string
+		var volume2Name string
+		var result executionResult
+		var volume1Contents volume
+		var volume2Contents volume
+
+		BeforeEach(func() {
+			volume1Name = createEmptyVolume()
+			volume2Name = createEmptyVolume()
+			volumes := []string{volume1Name, volume2Name}
+
+			config := `{
+				"caches": [
+					{ "path": "/caches/1" },
+					{ "path": "/caches/2" }
+				]
+			}`
+
+			result = runImage(volumes, config)
+			volume1Contents = getVolumeContents(volume1Name)
+			volume2Contents = getVolumeContents(volume2Name)
+		})
+
+		AfterEach(func() {
+			deleteVolume(volume1Name)
+			deleteVolume(volume2Name)
+		})
+
+		It("returns a zero exit code and no error", func() {
+			Expect(result).To(Equal(executionResult{
+				Output:   "Processed /caches/1.\r\nProcessed /caches/2.\r\nDone.",
+				ExitCode: 0,
+			}))
+		})
+
+		It("ensures that both volumes contain a .cache-init file", func() {
+			Expect(volume1Contents.Contents).To(ContainElement(volumeEntry{
+				Name: ".cache-init",
+			}))
+
+			Expect(volume2Contents.Contents).To(ContainElement(volumeEntry{
+				Name: ".cache-init",
 			}))
 		})
 	})
@@ -44,7 +203,7 @@ var _ = Describe("the cache-init image", func() {
 		var result executionResult
 
 		BeforeEach(func() {
-			result = runImage()
+			result = runImage(noVolumes)
 		})
 
 		It("returns a non-zero exit code and an error", func() {
@@ -59,7 +218,7 @@ var _ = Describe("the cache-init image", func() {
 		var result executionResult
 
 		BeforeEach(func() {
-			result = runImage("{}", "{}")
+			result = runImage(noVolumes, "{}", "{}")
 		})
 
 		It("returns a non-zero exit code and an error", func() {
@@ -74,7 +233,7 @@ var _ = Describe("the cache-init image", func() {
 		var result executionResult
 
 		BeforeEach(func() {
-			result = runImage("{")
+			result = runImage(noVolumes, "{")
 		})
 
 		It("returns a non-zero exit code and an error", func() {
@@ -89,7 +248,7 @@ var _ = Describe("the cache-init image", func() {
 		var result executionResult
 
 		BeforeEach(func() {
-			result = runImage(`{"thing":2}`)
+			result = runImage(noVolumes, `{"thing":2}`)
 		})
 
 		It("returns a non-zero exit code and an error", func() {
@@ -100,34 +259,3 @@ var _ = Describe("the cache-init image", func() {
 		})
 	})
 })
-
-type executionResult struct {
-	Output   string
-	ExitCode int
-}
-
-func runImage(input ...string) executionResult {
-	imageTag, haveImageTag := os.LookupEnv("IMAGE_TAG")
-
-	if !haveImageTag {
-		panic("IMAGE_TAG environment variable not set.")
-	}
-
-	args := append([]string{"run", "--rm", "-t", imageTag}, input...)
-	cmd := exec.Command("docker", args...)
-	output, err := cmd.CombinedOutput()
-
-	result := executionResult{
-		Output: strings.TrimSpace(string(output)),
-	}
-
-	if err != nil {
-		if exiterr, ok := err.(*exec.ExitError); ok {
-			result.ExitCode = exiterr.ExitCode()
-		} else {
-			panic(fmt.Sprintf("Could not run application: %v", err))
-		}
-	}
-
-	return result
-}

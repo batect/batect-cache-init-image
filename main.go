@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -27,6 +28,8 @@ type config struct {
 
 type cache struct {
 	Path string
+	Uid  int
+	Gid  int
 }
 
 func main() {
@@ -40,14 +43,53 @@ func main() {
 		os.Exit(1)
 	}
 
+	config := loadConfig()
+
+	for _, cache := range config.Caches {
+		if err := process(cache); err != nil {
+			exitWithError(fmt.Sprintf("Could not process %v", cache.Path), err)
+		}
+
+		fmt.Printf("Processed %v.\n", cache.Path)
+	}
+
+	println("Done.")
+}
+
+func process(cache cache) error {
+	initFilePath := filepath.Join(cache.Path, ".cache-init")
+	f, err := os.Create(initFilePath)
+
+	if err != nil {
+		return fmt.Errorf("could not create %v: %w", initFilePath, err)
+	}
+
+	if err := f.Close(); err != nil {
+		return fmt.Errorf("could not close %v: %w", initFilePath, err)
+	}
+
+	if err := os.Chown(initFilePath, cache.Uid, cache.Gid); err != nil {
+		return fmt.Errorf("could not set owner and group for %v: %w", initFilePath, err)
+	}
+
+	if err := os.Chown(cache.Path, cache.Uid, cache.Gid); err != nil {
+		return fmt.Errorf("could not set owner and group for %v: %w", cache.Path, err)
+	}
+
+	return nil
+}
+
+func loadConfig() config {
 	arg := os.Args[1]
-	spec := config{}
+	config := config{}
 	decoder := json.NewDecoder(strings.NewReader(arg))
 	decoder.DisallowUnknownFields()
 
-	if err := decoder.Decode(&spec); err != nil {
+	if err := decoder.Decode(&config); err != nil {
 		exitWithError("Input is invalid", err)
 	}
+
+	return config
 }
 
 func exitWithError(context string, err error) {
