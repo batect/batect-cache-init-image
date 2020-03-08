@@ -14,6 +14,43 @@
 
 package main
 
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"strings"
+)
+
+type config struct {
+	Caches []cache
+}
+
+type cache struct {
+	Path string
+}
+
 func main() {
-	println("Hello world")
+	if len(os.Args) <= 1 {
+		println("No arguments provided.")
+		os.Exit(1)
+	}
+
+	if len(os.Args) > 2 {
+		println("Too many arguments provided.")
+		os.Exit(1)
+	}
+
+	arg := os.Args[1]
+	spec := config{}
+	decoder := json.NewDecoder(strings.NewReader(arg))
+	decoder.DisallowUnknownFields()
+
+	if err := decoder.Decode(&spec); err != nil {
+		exitWithError("Input is invalid", err)
+	}
+}
+
+func exitWithError(context string, err error) {
+	fmt.Printf("%v: %v\n", context, err)
+	os.Exit(1)
 }

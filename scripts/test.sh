@@ -8,5 +8,5 @@ IMAGE_TAG=${1:-batect-cache-init-image}
 echo
 
 echo "Running tests..."
-go test .
+IMAGE_TAG=$IMAGE_TAG go test .
 
