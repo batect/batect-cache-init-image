@@ -16,23 +16,29 @@ FILE="app/src/main/resources/cache-init-image-reference"
   echo "Configuring Git..."
   git config user.name "batect-cache-init-image pipeline"
   git config user.email "cache-init-image-pipeline@batect.dev"
+  echo
 
   echo "Setting image reference to '$IMAGE_DIGEST'..."
   mkdir -p "$(dirname "$FILE")"
   echo "$IMAGE_DIGEST" > "$FILE"
+  echo
 
   echo "Preparing commit..."
   git add "$FILE"
+  echo
 
   echo "Committing..."
   git commit -m "Update reference to cache init image."
+  echo
 
   echo "Pushing..."
   git show
   #  git push
+  echo
 }
 
 echo "Cleaning up..."
 rm -rf "$WORK_DIR"
+echo
 
 echo "Done!"
