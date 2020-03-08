@@ -50,8 +50,8 @@ jobs:
         if: github.repository == 'batect/batect-cache-init-image' && github.ref == 'refs/heads/master'
         run: docker login -u $USERNAME -p $PASSWORD
         env:
-          GITHUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-          GITHUB_TOKEN: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       - name: Push image
         if: github.repository == 'batect/batect-cache-init-image' && github.ref == 'refs/heads/master'
