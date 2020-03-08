@@ -29,8 +29,6 @@ type executionResult struct {
 	ExitCode int
 }
 
-var noVolumes []string
-
 func runImage(volumesToMount []string, input ...string) executionResult {
 	imageTag := getImageTag()
 
@@ -84,6 +82,7 @@ func createEmptyVolume() string {
 }
 
 func addCacheInitFile(volumeName string) {
+	// #nosec G204
 	cmd := exec.Command("docker", "run", "--rm", "-t", "-v", fmt.Sprintf("%v:/cache", volumeName), "alpine:3.11.3", "touch", "/cache/.cache-init")
 
 	if output, err := cmd.CombinedOutput(); err != nil {
@@ -92,6 +91,7 @@ func addCacheInitFile(volumeName string) {
 }
 
 func getVolumeContents(volumeName string) volume {
+	// #nosec G204
 	cmd := exec.Command("docker", "run", "--rm", "-t", "-v", fmt.Sprintf("%v:/cache", volumeName), "alpine:3.11.3", "ls", "-an", "--color=never", "/cache")
 	output, err := cmd.CombinedOutput()
 
@@ -104,7 +104,7 @@ func getVolumeContents(volumeName string) volume {
 		Contents: []volumeEntry{},
 	}
 
-	splitter := regexp.MustCompile("\\s+")
+	splitter := regexp.MustCompile(`\s+`)
 
 	for _, line := range lines[1:] {
 		parts := splitter.Split(line, -1)
@@ -113,12 +113,12 @@ func getVolumeContents(volumeName string) volume {
 		name := parts[8]
 
 		if name == "." {
-			volume.Uid = uid
-			volume.Gid = gid
+			volume.UID = uid
+			volume.GID = gid
 		} else if name != ".." {
 			volume.Contents = append(volume.Contents, volumeEntry{
-				Uid:  uid,
-				Gid:  gid,
+				UID:  uid,
+				GID:  gid,
 				Name: name,
 			})
 		}
@@ -128,14 +128,14 @@ func getVolumeContents(volumeName string) volume {
 }
 
 type volume struct {
-	Uid      int
-	Gid      int
+	UID      int
+	GID      int
 	Contents []volumeEntry
 }
 
 type volumeEntry struct {
-	Uid  int
-	Gid  int
+	UID  int
+	GID  int
 	Name string
 }
 

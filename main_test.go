@@ -20,6 +20,8 @@ import (
 )
 
 var _ = Describe("the cache-init image", func() {
+	var noVolumes []string
+
 	Context("when the application is given an empty configuration", func() {
 		var result executionResult
 
@@ -54,11 +56,11 @@ var _ = Describe("the cache-init image", func() {
 								]
 							}`
 
-		singleVolumeWithUidAndGidConfig := `{
-								"caches": [
-									{ "path": "/caches/1", "uid": 123, "gid": 456 }
-								]
-							}`
+		singleVolumeWithUIDAndGIDConfig := `{
+												"caches": [
+													{ "path": "/caches/1", "uid": 123, "gid": 456 }
+												]
+											}`
 
 		itReturnsAZeroExitCodeAndNoError := func(result *executionResult) {
 			It("returns a zero exit code and no error", func() {
@@ -72,8 +74,8 @@ var _ = Describe("the cache-init image", func() {
 		itEnsuresVolumeContainsCacheInitFile := func(volumeContents *volume, uid int, gid int) {
 			It("ensures that the volume contains a .cache-init file with the provided user and group", func() {
 				Expect(volumeContents.Contents).To(ContainElement(volumeEntry{
-					Uid:  uid,
-					Gid:  gid,
+					UID:  uid,
+					GID:  gid,
 					Name: ".cache-init",
 				}))
 			})
@@ -81,11 +83,11 @@ var _ = Describe("the cache-init image", func() {
 
 		itSetsOwnerAndGroupOfVolume := func(volumeContents *volume, uid int, gid int) {
 			It("sets the owner of the volume to the provided user", func() {
-				Expect(volumeContents.Uid).To(Equal(uid))
+				Expect(volumeContents.UID).To(Equal(uid))
 			})
 
 			It("sets the group of the volume to the provided group", func() {
-				Expect(volumeContents.Gid).To(Equal(gid))
+				Expect(volumeContents.GID).To(Equal(gid))
 			})
 		}
 
@@ -108,7 +110,7 @@ var _ = Describe("the cache-init image", func() {
 				var volumeContents volume
 
 				BeforeEach(func() {
-					result = runImage(volumes, singleVolumeWithUidAndGidConfig)
+					result = runImage(volumes, singleVolumeWithUIDAndGIDConfig)
 					volumeContents = getVolumeContents(volumeName)
 				})
 
@@ -141,7 +143,7 @@ var _ = Describe("the cache-init image", func() {
 				var volumeContents volume
 
 				BeforeEach(func() {
-					result = runImage(volumes, singleVolumeWithUidAndGidConfig)
+					result = runImage(volumes, singleVolumeWithUIDAndGIDConfig)
 					volumeContents = getVolumeContents(volumeName)
 				})
 

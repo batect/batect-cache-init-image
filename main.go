@@ -28,8 +28,8 @@ type config struct {
 
 type cache struct {
 	Path string
-	Uid  int
-	Gid  int
+	UID  int
+	GID  int
 }
 
 func main() {
@@ -68,11 +68,11 @@ func process(cache cache) error {
 		return fmt.Errorf("could not close %v: %w", initFilePath, err)
 	}
 
-	if err := os.Chown(initFilePath, cache.Uid, cache.Gid); err != nil {
+	if err := os.Chown(initFilePath, cache.UID, cache.GID); err != nil {
 		return fmt.Errorf("could not set owner and group for %v: %w", initFilePath, err)
 	}
 
-	if err := os.Chown(cache.Path, cache.Uid, cache.Gid); err != nil {
+	if err := os.Chown(cache.Path, cache.UID, cache.GID); err != nil {
 		return fmt.Errorf("could not set owner and group for %v: %w", cache.Path, err)
 	}
 
