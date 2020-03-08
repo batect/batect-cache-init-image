@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-files=$(find . \( -name "*.go" -or -name "*.tf" \) -type f -not -path './.go-cache/*' -not -path './vendor/*')
+files=$(find . \( -name "*.go" \) -type f -not -path './vendor/*')
 
 desired_header="\
 // Copyright 2020 Charles Korn.
