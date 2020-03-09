@@ -4,7 +4,7 @@ version: 1
 update_configs:
   - package_manager: docker
     update_schedule: daily
-    directory: /
+    directory: docker
     automerged_updates:
       - match:
           dependency_type: all
