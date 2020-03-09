@@ -63,6 +63,6 @@ jobs:
         if: github.repository == 'batect/batect-cache-init-image' && github.ref == 'refs/heads/master'
         run: ./scripts/update_batect_image_ref.sh
         env:
-          GITHUB_USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_USERNAME: ${{ secrets.GITHUB_PUSH_USERNAME }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_PUSH_TOKEN }}
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
