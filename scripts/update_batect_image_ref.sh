@@ -33,8 +33,7 @@ FILE="app/src/main/kotlin/batect/execution/CacheInitialisationImage.kt"
   echo
 
   echo "Pushing..."
-  git show
-  #  git push
+  git push
   echo
 }
 
