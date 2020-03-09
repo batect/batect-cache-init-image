@@ -2,6 +2,7 @@
 
 set -euo pipefail
 
+SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IMAGE_DIGEST=$(docker inspect "$IMAGE_TAG" --format '{{ index .RepoDigests 0 }}')
 WORK_DIR=$(mktemp -d)
 FILE="app/src/main/kotlin/batect/execution/CacheInitialisationImage.kt"
@@ -20,7 +21,7 @@ FILE="app/src/main/kotlin/batect/execution/CacheInitialisationImage.kt"
 
   echo "Setting image reference to '$IMAGE_DIGEST'..."
   mkdir -p "$(dirname "$FILE")"
-  sed "s#REPLACE_WITH_IMAGE_TAG#$IMAGE_DIGEST#" scripts/Template.kt > "$FILE"
+  sed "s#REPLACE_WITH_IMAGE_TAG#$IMAGE_DIGEST#" "$SCRIPT_PATH/Template.kt" > "$FILE"
   echo
 
   echo "Preparing commit..."
