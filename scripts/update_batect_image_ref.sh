@@ -4,7 +4,7 @@ set -euo pipefail
 
 IMAGE_DIGEST=$(docker inspect "$IMAGE_TAG" --format '{{ index .RepoDigests 0 }}')
 WORK_DIR=$(mktemp -d)
-FILE="app/src/main/resources/cache-init-image-reference"
+FILE="app/src/main/kotlin/batect/execution/CacheInitialisationImage.kt"
 
 {
   echo "Cloning repo..."
@@ -20,7 +20,7 @@ FILE="app/src/main/resources/cache-init-image-reference"
 
   echo "Setting image reference to '$IMAGE_DIGEST'..."
   mkdir -p "$(dirname "$FILE")"
-  echo "$IMAGE_DIGEST" > "$FILE"
+  sed "s#REPLACE_WITH_IMAGE_TAG#$IMAGE_DIGEST#" scripts/Template.kt > "$FILE"
   echo
 
   echo "Preparing commit..."
