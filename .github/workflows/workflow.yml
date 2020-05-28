@@ -66,3 +66,4 @@ jobs:
           GITHUB_USERNAME: ${{ secrets.GITHUB_PUSH_USERNAME }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_PUSH_TOKEN }}
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
+          COMMIT_SHA: ${{ github.sha }}

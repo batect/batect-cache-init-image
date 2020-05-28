@@ -29,7 +29,7 @@ FILE="app/src/main/kotlin/batect/execution/CacheInitialisationImage.kt"
   echo
 
   echo "Committing..."
-  git commit -m "Update reference to cache init image."
+  git commit -m "Update reference to cache init image with version from https://github.com/batect/batect-cache-init-image/commit/$COMMIT_SHA."
   echo
 
   echo "Pushing..."
