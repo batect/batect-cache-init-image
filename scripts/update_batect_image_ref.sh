@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+# FIXME: GPG signing for commit
+
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IMAGE_DIGEST=$(docker inspect "$IMAGE_TAG" --format '{{ index .RepoDigests 0 }}')
 WORK_DIR=$(mktemp -d)
