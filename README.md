@@ -1,6 +1,6 @@
 # batect-cache-init-image
 
-[![Build Status](https://img.shields.io/github/workflow/status/batect/batect-cache-init-image/Pipeline/master)](https://github.com/batect/batect-cache-init-image/actions?query=workflow%3APipeline+branch%3Amaster)
+[![Build Status](https://img.shields.io/github/workflow/status/batect/batect-cache-init-image/Pipeline/main)](https://github.com/batect/batect-cache-init-image/actions?query=workflow%3APipeline+branch%3Amain)
 [![License](https://img.shields.io/github/license/batect/batect-cache-init-image.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Chat](https://img.shields.io/badge/chat-on%20spectrum-brightgreen.svg)](https://spectrum.chat/batect)
 
