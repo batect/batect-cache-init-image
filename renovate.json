@@ -1,0 +1,20 @@
+{
+  "extends": ["github>batect/renovate-config:default"],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "dockerfile",
+        "github-actions"
+      ],
+      "automerge": true
+    },
+    {
+      "matchManagers": ["gomod"],
+      "matchPackageNames": [
+        "github.com/onsi/ginkgo",
+        "github.com/onsi/gomega"
+      ],
+      "automerge": true
+    }
+  ]
+}
