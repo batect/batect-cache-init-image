@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_MANIFEST_TAG: batect/batect-cache-init-image:${{ github.sha }}
+      DOCKER_BUILDKIT: 1
 
     steps:
       - name: Checkout code
@@ -47,7 +48,7 @@ jobs:
         if: github.repository == 'batect/batect-cache-init-image' && github.ref == 'refs/heads/main'
         run: ./scripts/build_and_push.sh ${{ env.IMAGE_MANIFEST_TAG }}
 
-      - name: Update image reference in main batect repo
+      - name: Update image reference in main Batect repo
         if: github.repository == 'batect/batect-cache-init-image' && github.ref == 'refs/heads/main'
         run: ./scripts/update_batect_image_ref.sh
         env:
