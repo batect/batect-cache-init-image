@@ -2,11 +2,11 @@
 
 set -euo pipefail
 
-IMAGE_TAG=${1:-batect-cache-init-image}
+IMAGE_MANIFEST_TAG=${1:-batect-cache-init-image:local-testing}
 
-./scripts/build.sh "$IMAGE_TAG"
+./scripts/build_image.sh "$IMAGE_MANIFEST_TAG" "amd64"
 echo
 
 echo "Running tests..."
-IMAGE_TAG=$IMAGE_TAG go test .
+IMAGE_MANIFEST_TAG=$IMAGE_MANIFEST_TAG go test .
 

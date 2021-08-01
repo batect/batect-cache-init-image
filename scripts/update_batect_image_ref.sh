@@ -5,7 +5,6 @@ set -euo pipefail
 # FIXME: GPG signing for commit
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-IMAGE_DIGEST=$(docker inspect "$IMAGE_TAG" --format '{{ index .RepoDigests 0 }}')
 WORK_DIR=$(mktemp -d)
 FILE="app/src/main/kotlin/batect/execution/CacheInitialisationImage.kt"
 
@@ -21,9 +20,13 @@ FILE="app/src/main/kotlin/batect/execution/CacheInitialisationImage.kt"
   git config user.email "batect-github-actions@batect.dev"
   echo
 
-  echo "Setting image reference to '$IMAGE_DIGEST'..."
+  echo "Getting image manifest digest..."
+  docker pull "$IMAGE_MANIFEST_TAG"
+  IMAGE_MANIFEST_DIGEST=$(docker inspect "$IMAGE_MANIFEST_TAG" --format '{{ index .RepoDigests 0 }}')
+
+  echo "Setting image reference to '$IMAGE_MANIFEST_DIGEST'..."
   mkdir -p "$(dirname "$FILE")"
-  sed "s#REPLACE_WITH_IMAGE_TAG#$IMAGE_DIGEST#" "$SCRIPT_PATH/Template.kt" > "$FILE"
+  sed "s#REPLACE_WITH_IMAGE_MANIFEST_TAG#$IMAGE_MANIFEST_DIGEST#" "$SCRIPT_PATH/Template.kt" > "$FILE"
   echo
 
   echo "Preparing commit..."

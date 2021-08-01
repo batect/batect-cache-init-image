@@ -17,5 +17,5 @@
 package batect.execution
 
 object CacheInitialisationImage {
-    val linuxDefault = "REPLACE_WITH_IMAGE_TAG"
+    val linuxDefault = "REPLACE_WITH_IMAGE_MANIFEST_TAG"
 }

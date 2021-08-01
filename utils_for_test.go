@@ -60,10 +60,10 @@ func runImage(volumesToMount []string, input ...string) executionResult {
 }
 
 func getImageTag() string {
-	imageTag, haveImageTag := os.LookupEnv("IMAGE_TAG")
+	imageTag, haveImageTag := os.LookupEnv("IMAGE_MANIFEST_TAG")
 
 	if !haveImageTag {
-		panic("IMAGE_TAG environment variable not set.")
+		panic("IMAGE_MANIFEST_TAG environment variable not set.")
 	}
 
 	return imageTag
