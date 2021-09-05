@@ -1,5 +1,9 @@
 # batect-cache-init-image
 
+:stop_sign: As of Batect 0.74.0, this image is no longer used and so has been deprecated. It is no longer maintained. 
+
+---
+
 [![Build Status](https://img.shields.io/github/workflow/status/batect/batect-cache-init-image/Pipeline/main)](https://github.com/batect/batect-cache-init-image/actions?query=workflow%3APipeline+branch%3Amain)
 [![License](https://img.shields.io/github/license/batect/batect-cache-init-image.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Chat](https://img.shields.io/badge/chat-on%20spectrum-brightgreen.svg)](https://spectrum.chat/batect)
